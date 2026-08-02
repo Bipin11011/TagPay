@@ -45,15 +45,20 @@ fun categorize(merchant: String): String {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     val transactions = listOf(
-        Transaction(merchant = "Swiggy", amount = 450.0, category = "Food"),
-        Transaction(merchant = "Uber", amount = 220.0, category = "Transport"),
-        Transaction(merchant = "Random Shop", amount = 100.0, category = "Uncategorized")
+        Transaction(merchant = "Swiggy", amount = 450.0, category = categorize("Swiggy")),
+        Transaction(merchant = "Uber", amount = 220.0, category = categorize("Uber")),
+        Transaction(merchant = "Random Shop", amount = 100.0, category = categorize(""))
     )
 
     var displayText = "Hello $name!\n"
     for (transaction in transactions) {
         displayText += "${transaction.merchant}: ₹${transaction.amount} - ${transaction.category}\n"
     }
+    var totalamount=0.0
+    for (transaction in transactions){
+        totalamount=addAmount(totalamount,transaction.amount)
+    }
+    displayText += " total amount: $totalamount"
 
     val foodTransactions = transactions.filter { it.category == "Food" }
     val totalFoodSpent = foodTransactions.sumOf { it.amount }

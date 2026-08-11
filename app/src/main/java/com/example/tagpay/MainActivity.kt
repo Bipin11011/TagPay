@@ -31,12 +31,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-class Transaction(val merchant: String, val amount: Double, val category: String)
-fun addAmount(current:Double,newAmmount: Double):Double{
-    return current+newAmmount
+class Transaction(val merchant: String, val amount: Double, val category: String) {
+
+    init {
+        require(amount > 0) { "Amount must be positive" }
+        require(merchant.isNotBlank()) { "Merchant cannot be blank" }
+    }
+
+    fun addAmount(extra: Double): Transaction {
+        require(extra > 0) { "Extra amount must be positive" }
+        return Transaction(merchant, amount + extra, category)
+    }
 }
 fun categorize(merchant: String): String {
     return when {
+
         merchant.contains("Swiggy") -> "Food"
         merchant.contains("Uber") -> "Transport"
         else -> "Uncategorized"
@@ -50,19 +59,23 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         Transaction(merchant = "Random Shop", amount = 100.0, category = categorize(""))
     )
 
+    val original = Transaction("Amazon", 500.0, "Shopping")
+    val updated = original.addAmount(200.0)
+
     var displayText = "Hello $name!\n"
     for (transaction in transactions) {
         displayText += "${transaction.merchant}: ₹${transaction.amount} - ${transaction.category}\n"
     }
-    var totalamount=0.0
-    for (transaction in transactions){
-        totalamount=addAmount(totalamount,transaction.amount)
-    }
-    displayText += " total amount: $totalamount"
+
+    val totalAmount = transactions.sumOf { it.amount }
+    displayText += " total amount: $totalAmount"
 
     val foodTransactions = transactions.filter { it.category == "Food" }
     val totalFoodSpent = foodTransactions.sumOf { it.amount }
     displayText += "\nTotal spent on Food: ₹$totalFoodSpent"
+
+    displayText += "\n\nOriginal: ${original.merchant} - ${original.amount}"
+    displayText += "\nUpdated: ${updated.merchant} - ${updated.amount}"
 
     Text(
         text = displayText,
